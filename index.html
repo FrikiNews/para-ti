@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Para Ti, Mi Amor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff5f6; --bg2:#fde4e8; --ink:#5a2a35; --soft:#9b5a68;
+    --rose:#e27a8b; --rose-dark:#c45569; --paper:#fffaf3;
+    --env:#f2b8bf; --env-dark:#e39aa4; --env-flap:#d9808d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
+    color:var(--ink); font-family:"Cormorant Garamond",Georgia,serif;
+    overflow-x:hidden; min-height:100vh;
+  }
+  .script{font-family:"Dancing Script",cursive}
+
+  /* Corazones flotando */
+  #hearts{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .h{position:absolute;bottom:-40px;color:var(--rose);opacity:.35;animation:subir linear forwards}
+  @keyframes subir{to{transform:translateY(-115vh) rotate(25deg);opacity:0}}
+
+  section{position:relative;z-index:1;padding:0 16px}
+
+  /* Portada */
+  .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}
+  .hero h1{font-size:clamp(3rem,11vw,6rem);color:var(--rose-dark);line-height:1}
+  .hero p{font-size:clamp(1.1rem,3.5vw,1.5rem);color:var(--soft);font-style:italic;max-width:520px}
+  .scroll-hint{margin-top:40px;font-size:1rem;color:var(--soft);display:flex;flex-direction:column;align-items:center;gap:6px}
+  .scroll-hint span{font-size:1.6rem;animation:rebote 1.6s infinite}
+  @keyframes rebote{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+
+  /* Fotos */
+  .galeria{max-width:1000px;margin:0 auto;padding-bottom:80px}
+  .galeria h2{text-align:center;font-size:clamp(2rem,7vw,3rem);color:var(--rose-dark);margin-bottom:40px}
+  .fotos{display:flex;flex-wrap:wrap;justify-content:center;gap:36px 28px}
+  .polaroid{
+    background:#fff;padding:12px 12px 16px;flex:1 1 220px;max-width:260px;
+    box-shadow:0 10px 30px rgba(120,40,60,.15);border-radius:3px;
+    opacity:0;transform:translateY(40px) rotate(var(--r));transition:opacity .9s ease,transform .9s ease;
+  }
+  .polaroid.visible{opacity:1;transform:translateY(0) rotate(var(--r))}
+  .polaroid:hover{transform:scale(1.04) rotate(0deg);z-index:2}
+  .marco{aspect-ratio:1/1;background:linear-gradient(135deg,#fbd3da,#f6b7c2);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-size:1.1rem;gap:4px}
+  .marco img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}
+  .marco .vacio{font-size:2.4rem}
+  .polaroid figcaption{text-align:center;margin-top:12px;font-size:1.35rem;color:var(--ink)}
+
+  /* Foto especial (pila de fotos) */
+  .polaroid.especial{cursor:pointer;position:relative;
+    box-shadow:0 10px 30px rgba(120,40,60,.15),7px 7px 0 -1px #fff,7px 7px 0 0 rgba(120,40,60,.12),14px 14px 0 -1px #fff,14px 14px 0 0 rgba(120,40,60,.12)}
+  .polaroid.especial figcaption{font-size:1.2rem;line-height:1.2}
+  .badge{position:absolute;top:-12px;right:-12px;background:var(--rose-dark);color:#fff;border-radius:999px;padding:4px 10px;font-size:.95rem;font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.2);animation:latido 2.2s ease-in-out infinite}
+  .ver-mas{display:block;text-align:center;font-size:.95rem;color:var(--soft);font-style:italic;margin-top:4px}
+
+  /* Galería abierta */
+  .gal-overlay{position:fixed;inset:0;z-index:11;background:rgba(90,42,53,.6);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .5s}
+  .gal-overlay.mostrar{opacity:1;pointer-events:auto}
+  .gal-box{position:relative;background:#fff;padding:18px 18px 22px;border-radius:6px;width:100%;max-width:440px;box-shadow:0 25px 60px rgba(60,20,30,.4);text-align:center}
+  .gal-titulo{font-size:clamp(1.5rem,5.5vw,2rem);color:var(--rose-dark);margin:6px 30px 14px;line-height:1.15}
+  .gal-foto{aspect-ratio:4/5;max-height:60vh;margin:0 auto;background:linear-gradient(135deg,#fbd3da,#f6b7c2);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;font-size:1.1rem;gap:4px}
+  .gal-foto img{width:100%;height:100%;object-fit:cover;display:block;animation:aparecer .5s ease}
+  .gal-foto .vacio{font-size:2.6rem}
+  @keyframes aparecer{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+  .gal-cap{font-size:1.4rem;margin-top:12px;color:var(--ink);min-height:1.6em}
+  .gal-nav{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(255,255,255,.9);color:var(--rose-dark);font-size:1.6rem;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.2);line-height:1}
+  .gal-nav:hover{background:#fff}
+  .gal-prev{left:-14px}.gal-next{right:-14px}
+  .dots{display:flex;justify-content:center;gap:7px;margin-top:10px}
+  .dots span{width:8px;height:8px;border-radius:50%;background:#f0c6cd;cursor:pointer}
+  .dots span.on{background:var(--rose-dark)}
+  @media (max-width:480px){.gal-prev{left:-6px}.gal-next{right:-6px}}
+
+  /* Sobre */
+  .sobre-sec{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:30px;padding-bottom:80px}
+  .sobre-sec h2{font-size:clamp(2rem,7vw,3rem);color:var(--rose-dark)}
+  .sobre-sec p{color:var(--soft);font-style:italic;font-size:1.2rem}
+  .sobre-wrap{opacity:0;transform:scale(.85);transition:opacity 1s ease,transform 1s ease;margin-top:110px}
+  .sobre-wrap.visible{opacity:1;transform:scale(1)}
+  .sobre{position:relative;width:320px;height:240px;background:var(--env-dark);cursor:pointer;border-radius:0 0 6px 6px;box-shadow:0 18px 40px rgba(120,40,60,.25);animation:latido 2.2s ease-in-out infinite}
+  .sobre.abierto{animation:none}
+  @keyframes latido{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+  .tapa{position:absolute;top:0;left:0;width:0;height:0;border-left:160px solid transparent;border-right:160px solid transparent;border-top:122px solid var(--env-flap);transform-origin:top;transition:transform .6s ease;z-index:4}
+  .bolsillo{position:absolute;inset:0;z-index:3;border-radius:0 0 6px 6px;overflow:hidden}
+  .bolsillo::before{content:"";position:absolute;left:0;bottom:0;width:0;height:0;border-left:160px solid var(--env);border-right:160px solid var(--env);border-top:120px solid transparent;border-bottom:120px solid var(--env)}
+  .frase-sobre{position:absolute;left:22px;right:22px;bottom:12px;z-index:4;text-align:center;font-size:1.05rem;line-height:1.25;color:#7a3443;transition:opacity .4s}
+  .sobre.abierto .frase-sobre{opacity:.35}
+  .hoja{position:absolute;left:14px;right:14px;top:12px;height:216px;background:var(--paper);z-index:2;border-radius:3px;transition:transform .8s ease .5s;display:flex;align-items:flex-start;justify-content:center;padding-top:18px;font-size:1.5rem;color:var(--rose-dark)}
+  .sello{position:absolute;top:96px;left:50%;transform:translateX(-50%);z-index:5;width:44px;height:44px;border-radius:50%;background:var(--rose-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 3px 8px rgba(0,0,0,.2);transition:opacity .3s}
+  .sobre.abierto .tapa{transform:rotateX(180deg);z-index:1}
+  .sobre.abierto .sello{opacity:0}
+  .sobre.abierto .hoja{transform:translateY(-130px)}
+  .toca{font-size:1.1rem;color:var(--soft)}
+
+  /* Carta abierta */
+  .carta-overlay{position:fixed;inset:0;z-index:10;background:rgba(90,42,53,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .6s}
+  .carta-overlay.mostrar{opacity:1;pointer-events:auto}
+  .carta{
+    position:relative;background:var(--paper);max-width:620px;width:100%;max-height:88vh;overflow-y:auto;
+    padding:48px 36px 40px;border-radius:6px;box-shadow:0 25px 60px rgba(60,20,30,.35);
+    background-image:repeating-linear-gradient(transparent 0 33px,#f3dfe2 33px 34px);
+    transform:translateY(30px) scale(.96);transition:transform .6s ease;
+  }
+  .carta-overlay.mostrar .carta{transform:none}
+  .carta h3{font-size:2.3rem;color:var(--rose-dark);margin-bottom:18px}
+  .carta p{font-size:1.25rem;line-height:34px;margin-bottom:17px;opacity:0;transform:translateY(8px);transition:opacity .8s,transform .8s}
+  .carta p.ver{opacity:1;transform:none}
+  .carta .firma{text-align:right;font-size:1.9rem;color:var(--rose-dark);margin-top:26px}
+  .cerrar{position:absolute;top:10px;right:14px;background:none;border:none;font-size:1.8rem;color:var(--soft);cursor:pointer;line-height:1}
+  .cerrar:hover{color:var(--rose-dark)}
+  @media (max-width:480px){.carta{padding:44px 22px 32px}.carta p{font-size:1.12rem}}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="hearts"></div>
+
+<section class="hero">
+  <h1 class="script" id="titulo">Para ti, mi amor</h1>
+  <p id="subtitulo">Hice esto solo para ti. Baja despacito…</p>
+  <div class="scroll-hint">desliza hacia abajo<span>♡</span></div>
+</section>
+
+<section class="galeria">
+  <h2 class="script">Nuestros momentos</h2>
+  <div class="fotos" id="fotos"></div>
+</section>
+
+<section class="sobre-sec">
+  <h2 class="script">Tengo algo para ti…</h2>
+  <p>Una cartita que escribí con todo mi corazón</p>
+  <div class="sobre-wrap" id="sobreWrap">
+    <div class="sobre" id="sobre" role="button" tabindex="0" aria-label="Abrir la carta">
+      <div class="tapa"></div>
+      <div class="hoja script">Te amo ♡</div>
+      <div class="bolsillo"></div>
+      <div class="frase-sobre script" id="fraseSobre"></div>
+      <div class="sello">♥</div>
+    </div>
+  </div>
+  <div class="toca" id="toca">toca el sobre para abrirlo</div>
+</section>
+
+<div class="gal-overlay" id="galOverlay">
+  <div class="gal-box">
+    <button class="cerrar" id="galCerrar" aria-label="Cerrar">×</button>
+    <div class="gal-titulo script" id="galTitulo"></div>
+    <div class="gal-foto" id="galFoto"></div>
+    <div class="gal-cap script" id="galCap"></div>
+    <div class="dots" id="galDots"></div>
+    <button class="gal-nav gal-prev" id="galPrev" aria-label="Anterior">‹</button>
+    <button class="gal-nav gal-next" id="galNext" aria-label="Siguiente">›</button>
+  </div>
+</div>
+
+<div class="carta-overlay" id="overlay">
+  <article class="carta" id="carta">
+    <button class="cerrar" id="cerrar" aria-label="Cerrar">×</button>
+    <h3 class="script" id="saludo"></h3>
+    <div id="cuerpo"></div>
+    <div class="firma script" id="firma"></div>
+  </article>
+</div>
+
+<script>
+/* =========================================================
+   ✏️  EDITA AQUÍ: tus fotos y tu carta
+   - Pon tus fotos en una carpeta llamada "fotos" junto a este archivo
+   - Cada párrafo de la carta va entre comillas, separado por comas
+   ========================================================= */
+const CONFIG = {
+  titulo: "Para ti, mi amor",
+  subtitulo: "Hice esto solo para ti. Baja despacito…",
+  fotos: [
+    { src: "fotos/sam5.jpg", texto: "Nuestra primera cita ♡" },
+    { src: "fotos/sam3.jpg", texto: "Tú y yo" },
+    { src: "fotos/sam1.jpg", texto: "Una noche que no olvido" },
+    // ⭐ Foto especial: al darle clic se abren varias fotos
+    {
+      texto: "Todas las veces que te he dicho: ¿cómo puedes ser tan hermosa?",
+      titulo: "¿Cómo puedes ser tan hermosa?",
+      galeria: [
+        { src: "fotos/sam7.jpg", texto: "Vez #1 ♡" },
+        { src: "fotos/sam6.jpg", texto: "Vez #2 ♡" },
+        { src: "fotos/sam8.jpg", texto: "Vez #3… y las que faltan ♡" }
+      ]
+    },
+    { src: "fotos/sam9.jpg", texto: "Mi lugar favorito: contigo" },
+    { src: "fotos/sam4.jpg", texto: "Mi beso favorito" },
+    { src: "fotos/sam10.jpg", texto: "Y mil besos más", pos: "center 72%" },
+    { src: "fotos/sam2.jpg", texto: "Por muchas fotos más" }
+  ],
+  fraseSobre: "Dios te dio la vida y a mí un regalo, y ahí es donde me di cuenta de que prefiero renunciar a todas las vidas posibles por una sola contigo.",
+  saludo: "Mi amor:",
+  carta: [
+    "Estoy escribiendo esto después de lo que pasó ayer. La verdad es que no soy muy bueno con las palabras, y sé que aún somos jóvenes y que tenemos poco tiempo conociéndonos. Pero puedo decirte que, en este corto tiempo, me has enseñado lo que significa el amor.",
+    "Siempre me ha costado conectar con alguien, pero contigo todo es tan distinto: a tu lado las risas surgen de la nada, las pláticas fluyen sin esfuerzo y hay una tranquilidad hermosa en simplemente estar juntos, sintiendo esa confianza bonita que me hace sentir en casa. El amor se me desborda con el simple hecho de pensarte, y eso mismo me da miedo. Me da miedo porque lo que siento por ti es real, de verdad me importa lo nuestro y valoro muchísimo cada instante que compartimos.",
+    "Te mentiría si dijera que no me asusta abrirte mi corazón. Mostrarme tal como soy contigo es como entregarte el poder de lastimarme, pero por la forma en la que me tratas y me cuidas, te daría esa confianza absoluta, porque sé que jamás usarías ese poder para hacerme daño. Así como tú me haces sentir seguro, quiero que tú también sepas que puedes confiar plenamente en mí; no importa la situación, quiero ser ese lugar seguro para ti, estar ahí para escucharte o simplemente abrazarte cuando lo necesites.",
+    "Sé que pueden venir problemas o situaciones difíciles que, a pesar de no ser algo nuestro, nos alcancen. A lo que voy con todo esto es a que habrá momentos complicados, pero pase lo que pase, quiero que tengas la certeza de que mi camino es a tu lado. Estoy completamente dispuesto a cruzar cualquier tormenta que se nos presente, porque lo que siento no es una necesidad, sino una absoluta e inquebrantable decisión de seguir adelante contigo."
+  ],
+  firma: "Con amor, tu novio ♡"
+};
+/* ========================================================= */
+
+document.getElementById("titulo").textContent = CONFIG.titulo;
+document.getElementById("subtitulo").textContent = CONFIG.subtitulo;
+
+// Fotos
+const cont = document.getElementById("fotos");
+CONFIG.fotos.forEach((f, i) => {
+  const fig = document.createElement("figure");
+  fig.className = "polaroid";
+  fig.style.setProperty("--r", (i % 2 ? 3 : -3) + (i % 3 - 1) + "deg");
+  const marco = document.createElement("div");
+  marco.className = "marco";
+  const portada = f.galeria ? f.galeria[0].src : f.src;
+  ponerFoto(marco, portada, f.texto, f.galeria ? "toca para ver" : "foto " + (i + 1));
+  if (f.pos && marco.firstChild.tagName === "IMG") marco.firstChild.style.objectPosition = f.pos;
+  const cap = document.createElement("figcaption");
+  cap.className = "script";
+  cap.textContent = f.texto;
+  fig.append(marco, cap);
+  if (f.galeria) {
+    fig.classList.add("especial");
+    fig.setAttribute("role", "button");
+    fig.tabIndex = 0;
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = "+" + f.galeria.length + " ♡";
+    const mas = document.createElement("span");
+    mas.className = "ver-mas";
+    mas.textContent = "toca para ver todas";
+    fig.append(badge, mas);
+    fig.addEventListener("click", () => abrirGaleria(f));
+    fig.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrirGaleria(f); } });
+  }
+  cont.appendChild(fig);
+});
+
+function ponerFoto(cont, src, alt, etiqueta) {
+  cont.innerHTML = "";
+  const img = new Image();
+  img.alt = alt;
+  img.onerror = () => { cont.innerHTML = '<span class="vacio">♡</span><span></span>'; cont.lastChild.textContent = etiqueta; };
+  img.src = src;
+  cont.appendChild(img);
+}
+
+// Galería de la foto especial
+const gal = { overlay: document.getElementById("galOverlay"), foto: document.getElementById("galFoto"),
+  cap: document.getElementById("galCap"), dots: document.getElementById("galDots"), items: [], i: 0 };
+function abrirGaleria(f) {
+  gal.items = f.galeria;
+  document.getElementById("galTitulo").textContent = f.titulo || f.texto;
+  gal.dots.innerHTML = "";
+  gal.items.forEach((_, k) => { const d = document.createElement("span"); d.onclick = () => verFoto(k); gal.dots.appendChild(d); });
+  verFoto(0);
+  gal.overlay.classList.add("mostrar");
+}
+function verFoto(k) {
+  gal.i = (k + gal.items.length) % gal.items.length;
+  const it = gal.items[gal.i];
+  ponerFoto(gal.foto, it.src, it.texto, "foto " + (gal.i + 1));
+  gal.cap.textContent = it.texto;
+  [...gal.dots.children].forEach((d, n) => d.classList.toggle("on", n === gal.i));
+}
+const cerrarGal = () => gal.overlay.classList.remove("mostrar");
+document.getElementById("galPrev").onclick = () => verFoto(gal.i - 1);
+document.getElementById("galNext").onclick = () => verFoto(gal.i + 1);
+document.getElementById("galCerrar").onclick = cerrarGal;
+gal.overlay.addEventListener("click", e => { if (e.target === gal.overlay) cerrarGal(); });
+document.addEventListener("keydown", e => {
+  if (!gal.overlay.classList.contains("mostrar")) return;
+  if (e.key === "ArrowLeft") verFoto(gal.i - 1);
+  if (e.key === "ArrowRight") verFoto(gal.i + 1);
+  if (e.key === "Escape") cerrarGal();
+});
+let toqueX = null;
+gal.foto.addEventListener("touchstart", e => { toqueX = e.touches[0].clientX; }, { passive: true });
+gal.foto.addEventListener("touchend", e => {
+  if (toqueX === null) return;
+  const dx = e.changedTouches[0].clientX - toqueX;
+  if (Math.abs(dx) > 40) verFoto(gal.i + (dx < 0 ? 1 : -1));
+  toqueX = null;
+});
+
+// Aparecer al hacer scroll
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); }
+}), { threshold: .25 });
+document.querySelectorAll(".polaroid, .sobre-wrap").forEach(el => io.observe(el));
+
+// Carta
+document.getElementById("fraseSobre").textContent = CONFIG.fraseSobre;
+document.getElementById("saludo").textContent = CONFIG.saludo;
+document.getElementById("firma").textContent = CONFIG.firma;
+const cuerpo = document.getElementById("cuerpo");
+CONFIG.carta.forEach(t => { const p = document.createElement("p"); p.textContent = t; cuerpo.appendChild(p); });
+
+const sobre = document.getElementById("sobre"), overlay = document.getElementById("overlay");
+function abrir() {
+  if (sobre.classList.contains("abierto")) { mostrarCarta(); return; }
+  sobre.classList.add("abierto");
+  document.getElementById("toca").textContent = "♡";
+  for (let i = 0; i < 18; i++) setTimeout(corazon, i * 60, true);
+  setTimeout(mostrarCarta, 1400);
+}
+function mostrarCarta() {
+  overlay.classList.add("mostrar");
+  document.getElementById("carta").scrollTop = 0;
+  cuerpo.querySelectorAll("p").forEach((p, i) => setTimeout(() => p.classList.add("ver"), 400 + i * 700));
+}
+sobre.addEventListener("click", abrir);
+sobre.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abrir(); } });
+document.getElementById("cerrar").addEventListener("click", () => {
+  overlay.classList.remove("mostrar");
+  document.getElementById("toca").textContent = "toca el sobre para leerla otra vez";
+});
+overlay.addEventListener("click", e => { if (e.target === overlay) document.getElementById("cerrar").click(); });
+
+// Corazones flotando
+const hearts = document.getElementById("hearts");
+function corazon(rafaga) {
+  const h = document.createElement("span");
+  h.className = "h";
+  h.textContent = Math.random() > .5 ? "♥" : "♡";
+  h.style.left = Math.random() * 100 + "vw";
+  h.style.fontSize = (12 + Math.random() * 22) + "px";
+  const dur = rafaga ? 3 + Math.random() * 2 : 8 + Math.random() * 6;
+  h.style.animationDuration = dur + "s";
+  if (rafaga) h.style.opacity = .8;
+  hearts.appendChild(h);
+  setTimeout(() => h.remove(), dur * 1000);
+}
+setInterval(() => corazon(false), 700);
+</script>
+</body>
+</html>
